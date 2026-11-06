@@ -7,6 +7,7 @@ from fastapi import APIRouter, WebSocket, UploadFile, File, Response
 from starlette.responses import JSONResponse
 from starlette.websockets import WebSocketDisconnect
 from loguru import logger
+from .dsh_session_api import register_dsh_session_routes
 from .service_context import ServiceContext
 from .websocket_handler import WebSocketHandler
 from .proxy_handler import ProxyHandler
@@ -25,6 +26,7 @@ def init_client_ws_route(default_context_cache: ServiceContext) -> APIRouter:
 
     router = APIRouter()
     ws_handler = WebSocketHandler(default_context_cache)
+    register_dsh_session_routes(router, default_context_cache)
 
     @router.websocket("/client-ws")
     async def websocket_endpoint(websocket: WebSocket):

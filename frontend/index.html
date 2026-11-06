@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Open-LLM-Vtuber</title>
+    <script type="module" crossorigin src="./assets/main-CKgUHFa9.js?v=masks2"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-QEkl09-0.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script>
+      const dshStyle = document.createElement("style");
+      dshStyle.textContent = `
+        #dsh-open, #dsh-panel {
+          font-family: "Segoe UI", "PingFang SC", sans-serif;
+        }
+        #dsh-open {
+          position: relative;
+          flex: 0 0 auto;
+          height: 40px;
+          margin: 0;
+          border: 0;
+          border-radius: 8px;
+          padding: 0 10px;
+          background: transparent;
+          color: inherit;
+          font-size: 14px;
+          z-index: 2;
+        }
+        #dsh-open.dsh-corner {
+          position: fixed;
+          top: max(8px, env(safe-area-inset-top));
+          right: 8px;
+          left: auto;
+          height: auto;
+          padding: 8px 14px;
+          border-radius: 999px;
+          background: rgba(20, 20, 24, 0.82);
+          color: #fff;
+          z-index: 2147483647;
+        }
+        #dsh-panel {
+          position: fixed;
+          z-index: 2147483647;
+          display: none;
+          top: 56px;
+          left: 12px;
+          width: min(420px, calc(100vw - 24px));
+          box-sizing: border-box;
+          flex-direction: column;
+          gap: 8px;
+          margin: 0;
+          padding: 14px;
+          border-radius: 16px;
+          background: rgba(20, 20, 24, 0.92);
+          color: #fff;
+        }
+        #dsh-panel.open { display: flex; }
+        #dsh-panel label, #dsh-status {
+          margin: 0;
+          font-size: 13px;
+          line-height: 1.4;
+        }
+        #dsh-id, #dsh-save {
+          width: 100%;
+          box-sizing: border-box;
+          border: 0;
+          border-radius: 10px;
+          font-size: 16px;
+        }
+        #dsh-id { padding: 10px 12px; }
+        #dsh-save { padding: 10px 12px; background: #fff; color: #111; }
+        #dsh-status { min-height: 1.4em; color: #d7d7dc; }
+      `;
+
+      const dshOpen = document.createElement("button");
+      dshOpen.id = "dsh-open";
+      dshOpen.type = "button";
+      dshOpen.textContent = "会话";
+
+      const dshPanel = document.createElement("form");
+      dshPanel.id = "dsh-panel";
+      dshPanel.innerHTML = `
+        <label for="dsh-id">把新的会话 ID 粘贴进来</label>
+        <input id="dsh-id" name="sessionId" type="text" autocomplete="off"
+          autocorrect="off" autocapitalize="off" spellcheck="false"
+          placeholder="session-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+        <button id="dsh-save" type="submit">接通</button>
+        <p id="dsh-status"></p>
+      `;
+
+      function toolbarIsClipped(menu) {
+        const box = menu.getBoundingClientRect();
+        if (box.width < 8 || box.height < 8) return true;
+        let parent = menu.parentElement;
+        while (parent && parent !== document.body) {
+          const style = getComputedStyle(parent);
+          const clips =
+            style.overflow !== "visible" ||
+            style.overflowX !== "visible" ||
+            style.overflowY !== "visible";
+          if (clips) {
+            const parentBox = parent.getBoundingClientRect();
+            if (parentBox.height < 8) return true;
+            if (box.bottom > parentBox.bottom + 1 || box.top < parentBox.top - 1) {
+              return true;
+            }
+          }
+          parent = parent.parentElement;
+        }
+        return false;
+      }
+
+      function placeDshButton() {
+        const menu = document.querySelector('[aria-label="Mode Menu"]');
+        const row = menu && menu.parentElement;
+        if (row && !toolbarIsClipped(menu)) {
+          dshOpen.classList.remove("dsh-corner");
+          row.style.position = "relative";
+          row.style.zIndex = "30";
+          if (dshOpen.parentElement !== row) row.appendChild(dshOpen);
+          return;
+        }
+        dshOpen.classList.add("dsh-corner");
+        if (dshOpen.parentElement !== document.body) document.body.appendChild(dshOpen);
+      }
+
+      function placeDshPanel() {
+        const box = dshOpen.getBoundingClientRect();
+        const width = Math.min(420, window.innerWidth - 24);
+        const left = Math.max(12, Math.min(box.left, window.innerWidth - width - 12));
+        dshPanel.style.width = `${width}px`;
+        dshPanel.style.left = `${left}px`;
+        dshPanel.style.top = `${Math.max(8, box.bottom + 8)}px`;
+      }
+
+      function keepDshMounted() {
+        if (!document.getElementById("dsh-style")) {
+          dshStyle.id = "dsh-style";
+          document.head.append(dshStyle);
+        }
+        if (!document.body.contains(dshPanel)) document.body.append(dshPanel);
+        placeDshButton();
+      }
+
+      keepDshMounted();
+      new MutationObserver(keepDshMounted).observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+      window.addEventListener("resize", placeDshButton);
+
+      dshOpen.addEventListener("click", async () => {
+        const opening = !dshPanel.classList.contains("open");
+        dshPanel.classList.toggle("open", opening);
+        dshOpen.setAttribute("aria-expanded", opening ? "true" : "false");
+        if (!opening) return;
+        placeDshPanel();
+        const status = dshPanel.querySelector("#dsh-status");
+        const input = dshPanel.querySelector("#dsh-id");
+        status.textContent = "正在读取…";
+        try {
+          const response = await fetch("/api/dsh-session");
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "读不到当前会话");
+          input.value = data.sessionId || "";
+          status.textContent = data.sessionId ? "当前已接通这个会话" : "";
+          input.focus();
+        } catch (error) {
+          status.textContent = error.message;
+        }
+      });
+
+      dshPanel.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const status = dshPanel.querySelector("#dsh-status");
+        const input = dshPanel.querySelector("#dsh-id");
+        const save = dshPanel.querySelector("#dsh-save");
+        save.disabled = true;
+        status.textContent = "正在接通…";
+        try {
+          const response = await fetch("/api/dsh-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId: input.value.trim() }),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "接通失败");
+          input.value = data.sessionId;
+          status.textContent = data.warning || "已接通。从下一句开始进这个会话。";
+        } catch (error) {
+          status.textContent = error.message;
+        } finally {
+          save.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

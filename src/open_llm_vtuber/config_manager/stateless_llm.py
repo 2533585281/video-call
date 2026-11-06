@@ -168,6 +168,29 @@ class ZhipuConfig(OpenAICompatibleConfig):
     base_url: str = Field("https://open.bigmodel.cn/api/paas/v4/", alias="base_url")
 
 
+class DshSessionConfig(StatelessLLMBaseConfig):
+    """Configuration for answering through an existing DSH session."""
+
+    session_id: str = Field(..., alias="session_id")
+    base_url: str = Field("http://127.0.0.1:55259", alias="base_url")
+
+    _DSH_DESCRIPTIONS: ClassVar[dict[str, Description]] = {
+        "session_id": Description(
+            en="DSH session id that speaks on the call",
+            zh="接这通电话的 DSH 会话 id",
+        ),
+        "base_url": Description(
+            en="DSH web API base URL on this computer",
+            zh="本机 DSH Web API 地址",
+        ),
+    }
+
+    DESCRIPTIONS: ClassVar[dict[str, Description]] = {
+        **StatelessLLMBaseConfig.DESCRIPTIONS,
+        **_DSH_DESCRIPTIONS,
+    }
+
+
 class DeepseekConfig(OpenAICompatibleConfig):
     """Configuration for Deepseek API."""
 
@@ -245,6 +268,7 @@ class StatelessLLMConfigs(I18nMixin, BaseModel):
     gemini_llm: GeminiConfig | None = Field(None, alias="gemini_llm")
     zhipu_llm: ZhipuConfig | None = Field(None, alias="zhipu_llm")
     deepseek_llm: DeepseekConfig | None = Field(None, alias="deepseek_llm")
+    dsh_session_llm: DshSessionConfig | None = Field(None, alias="dsh_session_llm")
     groq_llm: GroqConfig | None = Field(None, alias="groq_llm")
     claude_llm: ClaudeConfig | None = Field(None, alias="claude_llm")
     llama_cpp_llm: LlamaCppConfig | None = Field(None, alias="llama_cpp_llm")
@@ -274,6 +298,10 @@ class StatelessLLMConfigs(I18nMixin, BaseModel):
         "zhipu_llm": Description(en="Configuration for Zhipu API", zh="Zhipu API 配置"),
         "deepseek_llm": Description(
             en="Configuration for Deepseek API", zh="Deepseek API 配置"
+        ),
+        "dsh_session_llm": Description(
+            en="Answer through an existing DSH session",
+            zh="把这通电话接到一个已有的 DSH 会话",
         ),
         "groq_llm": Description(en="Configuration for Groq API", zh="Groq API 配置"),
         "claude_llm": Description(

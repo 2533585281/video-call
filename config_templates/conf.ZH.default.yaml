@@ -159,6 +159,10 @@ character_config:
         model: 'deepseek-chat' # 使用的模型
         temperature: 0.7 # 注意，DeepSeek 的温度范围是 0 到 1
 
+      dsh_session_llm:
+        session_id: 'session-your-id' # 接电话的 DSH 会话
+        base_url: 'http://127.0.0.1:55259' # 本机 DSH Web API
+
       mistral_llm:
         llm_api_key: 'Your Mistral API key' # Mistral API 密钥
         model: 'pixtral-large-latest' # 使用的模型

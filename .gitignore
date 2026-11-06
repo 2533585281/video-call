@@ -1,6 +1,11 @@
 # ignore the user configuration file
 conf.yaml
 
+# home certificate and its private key
+/tls/
+
+tools/node_modules/
+
 # ignore non-default background images
 /backgrounds/*
 !/backgrounds/README.md

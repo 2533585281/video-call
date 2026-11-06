@@ -1,3 +1,5 @@
+这台电脑上的通话怎么装、怎么开、改了什么，写在 [read.md](./read.md)。
+
 ![](./assets/banner.jpg)
 
 <h1 align="center">Open-LLM-VTuber</h1>

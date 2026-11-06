@@ -67,6 +67,13 @@ class LLMFactory:
             return LlamaLLM(
                 model_path=kwargs.get("model_path"),
             )
+        elif llm_provider == "dsh_session_llm":
+            from .stateless_llm.dsh_session_llm import DshSessionLLM
+
+            return DshSessionLLM(
+                session_id=kwargs.get("session_id"),
+                base_url=kwargs.get("base_url"),
+            )
         elif llm_provider == "claude_llm":
             return ClaudeLLM(
                 system=kwargs.get("system_prompt"),

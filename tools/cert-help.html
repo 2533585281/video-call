@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>手机接入</title>
+  <style>
+    body { font-family: "Segoe UI", "PingFang SC", sans-serif; margin: 0; background: #f6f3ee; color: #1c1915; }
+    main { max-width: 40rem; margin: 0 auto; padding: 1.4rem 1.1rem 3rem; }
+    h1 { font-size: 1.45rem; margin-bottom: 0.3rem; }
+    p, li { line-height: 1.55; }
+    .card { background: white; border-radius: 14px; padding: 1rem 1.1rem; margin: 0.9rem 0; }
+    a.btn { display: inline-block; margin: 0.35rem 0.45rem 0.35rem 0; padding: 0.7rem 0.95rem; background: #1c1915; color: white; text-decoration: none; border-radius: 999px; }
+    code { background: #efeae2; padding: 0.1rem 0.35rem; border-radius: 6px; }
+    .warn { background: #fff4d6; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>让手机连上她</h1>
+  <p>请用 Chrome 或 Safari 打开。微信、QQ、抖音里的浏览器装不了证书，也经常不给麦克风。</p>
+
+  <div class="card warn">
+    <strong>人在家里</strong>
+    <p>先装下面这张证书，再用带锁的地址打开。普通的 http 网址，手机不给麦克风，也不给摄像头。</p>
+    <p>通话地址：<code id="https-url">https://192.168.1.23:12394/</code></p>
+    <a class="btn" id="cer" href="/ca.cer">安卓下载证书</a>
+    <a class="btn" id="cfg" href="/ca.mobileconfig">iPhone 下载描述文件</a>
+  </div>
+
+  <div class="card">
+    <h2>安卓</h2>
+    <ol>
+      <li>点「安卓下载证书」。如果提示可能有害，选仍要下载。文件名如果变成了别的，改成 <code>ca.crt</code>。</li>
+      <li>设置 → 安全 → 加密与凭据 → 安装证书 → <strong>CA 证书</strong>。要装进「用户凭据」，不要装成 VPN。</li>
+      <li>关掉 Chrome 再打开，用上面的 https 地址。第一次允许麦克风和摄像头。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>iPhone</h2>
+    <ol>
+      <li>点「iPhone 下载描述文件」，允许下载。</li>
+      <li>设置 → 通用 → VPN 与设备管理 → 安装描述文件。</li>
+      <li>设置 → 通用 → 关于本机 → 证书信任设置 → 打开这张证书的开关。不打开的话，Safari 仍然不给麦克风。</li>
+      <li>用 Safari 打开上面的 https 地址。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>人在外面</h2>
+    <p>家里这张自签证书到了外网就对不上地址。外面用 Tunnel 给的那条 https 链接，手机什么都不用装。同样不要放进微信里打开。</p>
+  </div>
+
+  <div class="card">
+    <h2>让她看见你</h2>
+    <p>页面左上角设置 → 通用 → 打开「使用摄像头背景」。这一步只有 https（或电脑上的 127.0.0.1）才做得到。开着摄像头说话时，这一帧会跟着话一起发给她。</p>
+  </div>
+</main>
+<script>
+  var host = location.hostname;
+  document.querySelectorAll("code").forEach(function (el) {
+    el.textContent = el.textContent.replaceAll("192.168.1.23", host);
+  });
+  document.getElementById("https-url").textContent = "https://" + host + ":12394/";
+</script>
+</body>
+</html>

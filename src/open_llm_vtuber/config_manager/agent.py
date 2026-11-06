@@ -25,6 +25,7 @@ class BasicMemoryAgentConfig(I18nMixin, BaseModel):
         "gemini_llm",
         "zhipu_llm",
         "deepseek_llm",
+        "dsh_session_llm",
         "groq_llm",
         "mistral_llm",
     ] = Field(..., alias="llm_provider")

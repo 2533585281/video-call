@@ -26,5 +26,26 @@
                 "": 1
             }
         }
+    },
+    {
+        "name": "deepseek_chan",
+        "description": "大肥鱼 DeepSeek-chan",
+        "url": "/live2d-models/deepseek_chan/大肥鱼.model3.json",
+        "kScale": 0.48,
+        "initialXshift": 0,
+        "initialYshift": 0,
+        "kXOffset": 0,
+        "idleMotionGroupName": "",
+        "defaultEmotion": 0,
+        "emotionMap": {
+            "neutral": 0,
+            "sadness": 1,
+            "anger": 2,
+            "disgust": 2,
+            "fear": 3,
+            "joy": 4,
+            "smirk": 5,
+            "surprise": 6
+        }
     }
 ]

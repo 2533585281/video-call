@@ -155,6 +155,10 @@ character_config:
         model: 'glm-4-flash'
         temperature: 1.0 # value between 0 to 2
 
+      dsh_session_llm:
+        session_id: 'session-your-id' # DSH session that answers the call
+        base_url: 'http://127.0.0.1:55259' # local DSH web API
+
       deepseek_llm:
         llm_api_key: 'Your DeepSeek API key'
         model: 'deepseek-chat'
